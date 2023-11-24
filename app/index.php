@@ -10,19 +10,30 @@ use Slim\Routing\RouteCollectorProxy;
 
 require __DIR__ . '/../vendor/autoload.php';
 require_once './db/AccesoDatos.php';
+require_once './JWT/AuthJWT.php';
 require_once './controllers/CuentaController.php';
+require_once './controllers/LoginController.php';
 
 // Instantiate App
 $app = AppFactory::create();
 // Set base path
-$app->setBasePath('/slim-deployment/2P-Programacion_3/app');
+$app->setBasePath('/2P-Programacion_3/app');
 // Add error middleware
 $app->addErrorMiddleware(true, true, true);
 // Add parse body
 $app->addBodyParsingMiddleware();
 
+//http://localhost/2P-Programacion_3/app/
+
+$app->group('/login', function (RouteCollectorProxy $group) {
+    $group->post('[/]', \LoginController::class . ':LoginController');
+});
+
 $app->group('/cuentas', function (RouteCollectorProxy $group) {
-    $group->post('[/]', \CuentaController::class . ':CargarCuenta');
+    $group->post('/cargarCuenta', \CuentaController::class . ':CargarCuenta');//val logger, tipo cta, validaciones de usuario repetido
+    $group->post('/consultarCuenta', \CuentaController::class . ':ConsultarCuentaController');//validar si existe el numero, si esta bien cargado el tipo de cuenta
+        //ValidarUsuarioEnJson -> MW para validar usuarios
+        //ValidarUsuarioYTipoEnJson -> MW para validar usuarios
 });
 
 $app->run();

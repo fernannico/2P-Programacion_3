@@ -16,8 +16,8 @@ class CuentaController extends Cuenta /*implements IApiUsable*/
         $mail = $parametros['mail'];
         $contrasena = $parametros['contrasena'];
         $tipoCuenta = $parametros['tipoCuenta'];
-        $moneda = $parametros['moneda'];
-        // $saldo = $parametros['saldo'];               ver que hacer porque es 0 por defecto pero puede crearse con algo de $ ya
+        $moneda = Cuenta::ObtenerMonedaPorCuenta($tipoCuenta);             
+        // $saldo = $parametros['saldo'];               ver que hacer porque es 0 por defecto pero CREO q puede crearse con algo de $ ya
 
         // Creamos el cuenta
         $cuenta = new Cuenta();
@@ -39,27 +39,38 @@ class CuentaController extends Cuenta /*implements IApiUsable*/
         return $response->withHeader('Content-Type', 'application/json');
     }
     
-    /*
-    public function TraerUno($request, $response, $args)
+    ///Se ingresa Tipo y Nro. de Cuenta, si coincide con algún registro del archivo banco.json, retornar la moneda/s y saldo de la cuenta/s.
+    public function ConsultarCuentaController($request, $response, $args)
     {
-        $queryParams = $request->getQueryParams();
-        $id = $queryParams['id'];
+        $parametros = $request->getParsedBody();
+        $nroCuenta = $parametros['nroCuenta'];
+        $tipoCuenta = $parametros['tipoCuenta'];
         
-        if(isset($id) & $id !== ""){
-            $cuenta = Cuenta::obtenerCuentaPorID($id);
-
-            if ($cuenta) {
-                $payload = json_encode($cuenta);
+        // if(isset($nroCuenta) & $nroCuenta !== ""){
+        $cuenta = Cuenta::ObtenerCuentaPorNroCuenta($nroCuenta);
+        if ($cuenta) {
+            // var_dump($cuenta);
+            $tipoCuentaBuscada = $cuenta->tipoCuenta;
+            if($tipoCuenta == $tipoCuentaBuscada){
+                $consulta = [
+                    "saldo" => $cuenta->saldo,
+                    "moneda" => $cuenta->moneda
+                ];    
+                $payload = json_encode($consulta);
                 $response->getBody()->write($payload);
-            } else {
-                $response->getBody()->write(json_encode(["error" => "Cuenta no encontrado"]));
+            }else{
+                $response->getBody()->write(json_encode(["error" => "Cuenta encontrada pero no con ese tipo de cuenta"]));
             }
-        }else{
-            $response->getBody()->write(json_encode(["error" => "ID de cuenta no proporcionado"]));            
+        } else {
+            $response->getBody()->write(json_encode(["error" => "Cuenta no encontrado"]));
         }
+        // }else{
+        //     $response->getBody()->write(json_encode(["error" => "ID de cuenta no proporcionado"]));            
+        // }
         return $response->withHeader('Content-Type', 'application/json');
     }
 
+    /*
     public function TraerTodos($request, $response, $args)
     {
         $lista = Cuenta::obtenerTodosCuentas();
