@@ -27,7 +27,7 @@ class Cuenta /*implements JsonSerializable*/{
     //     $this->estado = $estado;
     // }
 
-public function CrearCuenta()
+    public function CrearCuenta()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO cuentas (nombre,apellido,nroDocumento,mail,contrasena,tipoCuenta,moneda) VALUES (:nombre,:apellido,:nroDocumento,:mail,:contrasena,:tipoCuenta,:moneda)");
@@ -74,6 +74,38 @@ public function CrearCuenta()
         // var_dump($cuentaBuscado);
         return $cuentaBuscado;
     }   
+
+    public static function ObtenerSaldoPorNroCuenta($nroCuenta)
+    {
+        $saldo = false;
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT saldo FROM cuentas WHERE nroCuenta = :nroCuenta");
+        $consulta->bindParam(":nroCuenta", $nroCuenta);
+        $consulta->execute();
+        
+        $saldo = $consulta->fetchColumn();
+        return $saldo;
+    }
+
+    public static function ActualizarSaldo($nroCuenta, $monto)
+    {
+        $retorno = false;
+        $saldo = self::ObtenerSaldoPorNroCuenta($nroCuenta);
+        $saldoNuevo = $saldo + $monto;
+        try {
+            //code...
+            $objetoAccesoDato = AccesoDatos::obtenerInstancia();
+            $consulta = $objetoAccesoDato->prepararConsulta("UPDATE cuentas SET saldo = :saldo WHERE nroCuenta = :nroCuenta");
+            $consulta->bindParam(":nroCuenta", $nroCuenta);
+            $consulta->bindParam(":saldo", $saldoNuevo);
+            $consulta->execute();
+            $retorno = true;
+        } catch (\Throwable $th) {
+            $retorno = false;
+        }
+
+        return $retorno;
+    }
     //getter/setter
     // public function GetNroCuenta() {
     //     return $this->nroCuenta;

@@ -13,6 +13,7 @@ require_once './db/AccesoDatos.php';
 require_once './JWT/AuthJWT.php';
 require_once './controllers/CuentaController.php';
 require_once './controllers/LoginController.php';
+require_once './controllers/DepositoController.php';
 
 // Instantiate App
 $app = AppFactory::create();
@@ -31,9 +32,16 @@ $app->group('/login', function (RouteCollectorProxy $group) {
 
 $app->group('/cuentas', function (RouteCollectorProxy $group) {
     $group->post('/cargarCuenta', \CuentaController::class . ':CargarCuenta');//val logger, tipo cta, validaciones de usuario repetido
+    //ValidarUsuarioEnJson -> MW para validar usuarios
+    //ValidarUsuarioYTipoEnJson -> MW para validar usuarios
+});
+
+$app->group('/consultas', function (RouteCollectorProxy $group) {
     $group->post('/consultarCuenta', \CuentaController::class . ':ConsultarCuentaController');//validar si existe el numero, si esta bien cargado el tipo de cuenta
-        //ValidarUsuarioEnJson -> MW para validar usuarios
-        //ValidarUsuarioYTipoEnJson -> MW para validar usuarios
+});
+
+$app->group('/operaciones', function (RouteCollectorProxy $group) {
+    $group->post('/deposito', \DepositoController::class . ':CargarDeposito');
 });
 
 $app->run();
