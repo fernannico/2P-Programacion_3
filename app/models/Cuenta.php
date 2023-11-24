@@ -62,6 +62,28 @@ class Cuenta /*implements JsonSerializable*/{
         return $moneda;
     }
 
+    // public static function ObtenerTodasCuentas()
+    // {
+    //     $objAccesoDatos = AccesoDatos::obtenerInstancia();
+    //     $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM cuentas");
+    //     $consulta->execute();
+        
+    //     return $consulta->fetchAll(PDO::FETCH_CLASS, 'Cuenta');
+    // }
+
+    public static function ObtenerCuentasPorNroDocumento($nroDocumento)
+    {
+        $cuentasEncontradas = array();
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT nroCuenta, nombre, apellido, tipoDocumento, nroDocumento, mail, tipoCuenta, moneda, saldo, estado FROM cuentas WHERE nroDocumento = :nroDocumento");
+        $consulta->bindParam(":nroDocumento", $nroDocumento);
+        $consulta->execute();
+        
+        $cuentasEncontradas = $consulta->fetchAll(PDO::FETCH_CLASS, 'Cuenta');
+        // var_dump($cuentasEncontradas);
+        return $cuentasEncontradas;
+    }   
+
     public static function ObtenerCuentaPorNroCuenta($nroCuenta)
     {
         $cuentaBuscado = false;
@@ -106,6 +128,7 @@ class Cuenta /*implements JsonSerializable*/{
 
         return $retorno;
     }
+
     //getter/setter
     // public function GetNroCuenta() {
     //     return $this->nroCuenta;

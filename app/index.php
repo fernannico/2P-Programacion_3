@@ -14,6 +14,7 @@ require_once './JWT/AuthJWT.php';
 require_once './controllers/CuentaController.php';
 require_once './controllers/LoginController.php';
 require_once './controllers/DepositoController.php';
+require_once './controllers/RetiroController.php';
 
 // Instantiate App
 $app = AppFactory::create();
@@ -38,10 +39,39 @@ $app->group('/cuentas', function (RouteCollectorProxy $group) {
 
 $app->group('/consultas', function (RouteCollectorProxy $group) {
     $group->post('/consultarCuenta', \CuentaController::class . ':ConsultarCuentaController');//validar si existe el numero, si esta bien cargado el tipo de cuenta
+
+    $group->get('/consultarOperaciones', \CuentaController::class . ':ConsultarOperacionesController');
+    
+    $group->group('/depositos', function (RouteCollectorProxy $group) {
+        //a- El total depositado (monto) por tipo de cuenta y moneda en un día en particular (se envía por parámetro), si no se pasa fecha, se muestran las del día anterior.
+        $group->get('/totalDepositado', \DepositoController::class . ':TotalDepositadoController');
+        // b- El listado de depósitos para un usuario en particular.
+        $group->get('/depositosUsuario', \DepositoController::class . ':DepositosUsuarioController');
+        // c- El listado de depósitos entre dos fechas ordenado por nombre.
+        $group->get('/depositosFechas', \DepositoController::class . ':DepositosFechasOrdenadoController');
+        // d- El listado de depósitos por tipo de cuenta.
+        $group->get('/depositosTipoCuenta', \DepositoController::class . ':DepositosTipoCuentaController');
+        // e- El listado de depósitos por moneda.
+        $group->get('/depositosMoneda', \DepositoController::class . ':DepositosPorMonedaController');
+    });
+    
+    $group->group('/retiros', function (RouteCollectorProxy $group) {
+        //a- El total depositado (monto) por tipo de cuenta y moneda en un día en particular (se envía por parámetro), si no se pasa fecha, se muestran las del día anterior.
+        $group->get('/totalRetirado', \RetiroController::class . ':TotalRetiradoController');
+        // b- El listado de depósitos para un usuario en particular.
+        $group->get('/retirosUsuario', \RetiroController::class . ':RetirosUsuarioController');
+        // c- El listado de depósitos entre dos fechas ordenado por nombre.
+        $group->get('/retirosFechas', \RetiroController::class . ':RetirosFechasOrdenadoController');
+        // d- El listado de depósitos por tipo de cuenta.
+        $group->get('/retirosTipoCuenta', \RetiroController::class . ':RetirosTipoCuentaController');
+        // e- El listado de depósitos por moneda.
+        $group->get('/retirosMoneda', \RetiroController::class . ':RetirosPorMonedaController');
+    });
 });
 
 $app->group('/operaciones', function (RouteCollectorProxy $group) {
     $group->post('/deposito', \DepositoController::class . ':CargarDeposito');
+    $group->post('/retiro', \RetiroController::class . ':CargarRetiro');
 });
 
 $app->run();

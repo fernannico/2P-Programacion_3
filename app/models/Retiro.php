@@ -1,25 +1,25 @@
 <?php
 
-    class Deposito /*implements JsonSerializable*/{
+    class Retiro /*implements JsonSerializable*/{
         public $id;
         public $fecha;
         public $nroCuenta;
         public $tipoCuenta;
         public $moneda;
-        public $deposito;
+        public $retiro;
         public $saldo;
 
-        public function crearDeposito()
+        public function crearRetiro()
         {
             $objAccesoDatos = AccesoDatos::obtenerInstancia();
-            $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO depositos (nroCuenta, tipoCuenta, moneda, deposito, saldo) VALUES (:nroCuenta,:tipoCuenta,:moneda,:deposito,:saldo)");
+            $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO retiros (nroCuenta, tipoCuenta, moneda, retiro, saldo) VALUES (:nroCuenta,:tipoCuenta,:moneda,:retiro,:saldo)");
 
             // $consulta->bindParam(':id', $this->nombre);
             // $consulta->bindParam(':fecha', $this->apellido);
             $consulta->bindParam(':nroCuenta', $this->nroCuenta);
             $consulta->bindParam(':tipoCuenta', $this->tipoCuenta);
             $consulta->bindParam(':moneda', $this->moneda);
-            $consulta->bindParam(':deposito', $this->deposito);
+            $consulta->bindParam(':retiro', $this->retiro);
             $consulta->bindParam(':saldo', $this->saldo);
 
             $consulta->execute();
@@ -27,13 +27,13 @@
             return $objAccesoDatos->obtenerUltimoId();
         }
 
-        public static function ObtenerTodosDepositos()
+        public static function ObtenerTodosRetiros()
         {
             $objAccesoDatos = AccesoDatos::obtenerInstancia();
-            $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM depositos");
+            $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM retiros");
             $consulta->execute();
             
-            return $consulta->fetchAll(PDO::FETCH_CLASS, 'Deposito');
+            return $consulta->fetchAll(PDO::FETCH_CLASS, 'Retiro');
         }
 
         public static function ObtenerConjuntoFechas($fechaInicio, $fechaFin) {
@@ -49,25 +49,25 @@
             return $fechas;
         }
     
-        public static function ObtenerDepositosEntreFechas($fechaInicio, $fechaFin) {
-            $depositosEntreFechas = Array();
-            $fechas = Deposito::ObtenerConjuntoFechas($fechaInicio,$fechaFin);
-            $depositos = Deposito::ObtenerTodosDepositos();
+        public static function ObtenerRetirosEntreFechas($fechaInicio, $fechaFin) {
+            $retirosEntreFechas = Array();
+            $fechas = Retiro::ObtenerConjuntoFechas($fechaInicio,$fechaFin);
+            $retiros = Retiro::ObtenerTodosRetiros();
             
-            // if($fechas !== null && $depositos !== null && !empty($depositos)){
+            // if($fechas !== null && $retiros !== null && !empty($retiros)){
                 foreach($fechas as $fecha){
-                    foreach($depositos as $deposito){
-                        $fechaDeposito = new DateTime($deposito->fecha);
-                        $fechaDepositoFormateada = $fechaDeposito->format('d-m-Y');            
-                        if($fechaDepositoFormateada == $fecha){
-                            // var_dump($deposito);
-                            $depositosEntreFechas[] = $deposito;
+                    foreach($retiros as $retiro){
+                        $fechaRetiro = new DateTime($retiro->fecha);
+                        $fechaRetiroFormateada = $fechaRetiro->format('d-m-Y');            
+                        if($fechaRetiroFormateada == $fecha){
+                            // var_dump($retiro);
+                            $retirosEntreFechas[] = $retiro;
                         }
                     }
                 }
             // }
     
-            return $depositosEntreFechas;
+            return $retirosEntreFechas;
         }
         public static function CompararPorNumeroDeCuenta($a, $b){
             if ($a->nroCuenta == $b->nroCuenta) {
@@ -76,8 +76,8 @@
             return ($a->nroCuenta < $b->nroCuenta) ? -1 : 1;
         }
         
-        public static function OrdenarDepositosPorNumeroCuenta($depositos){
-            usort($depositos, 'Deposito::CompararPorNumeroDeCuenta');
-            return $depositos;
+        public static function OrdenarRetirosPorNumeroCuenta($retiros){
+            usort($retiros, 'Retiro::CompararPorNumeroDeCuenta');
+            return $retiros;
         }
     }

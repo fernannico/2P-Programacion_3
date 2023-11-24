@@ -1,5 +1,7 @@
 <?php
 require_once './models/Cuenta.php';
+require_once './models/Retiro.php';
+require_once './models/Deposito.php';
 // require_once './interfaces/IApiUsable.php';
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -42,9 +44,12 @@ class CuentaController extends Cuenta /*implements IApiUsable*/
     ///Se ingresa Tipo y Nro. de Cuenta, si coincide con algún registro del archivo banco.json, retornar la moneda/s y saldo de la cuenta/s.
     public function ConsultarCuentaController($request, $response, $args)
     {
-        $parametros = $request->getParsedBody();
-        $nroCuenta = $parametros['nroCuenta'];
-        $tipoCuenta = $parametros['tipoCuenta'];
+        $header = $request->getHeaderLine('Authorization');
+        $token = trim(explode("Bearer", $header)[1]);
+        
+        $data = AutentificadorJWT::ObtenerData($token);
+        $nroCuenta = $data->nroCuenta;
+        $tipoCuenta = $data->tipoCuenta;
         
         // if(isset($nroCuenta) & $nroCuenta !== ""){
         $cuenta = Cuenta::ObtenerCuentaPorNroCuenta($nroCuenta);
@@ -70,6 +75,42 @@ class CuentaController extends Cuenta /*implements IApiUsable*/
         return $response->withHeader('Content-Type', 'application/json');
     }
 
+    public static function ConsultarOperacionesController($request, $response, $args)
+    {
+        $header = $request->getHeaderLine('Authorization');
+        $token = trim(explode("Bearer", $header)[1]);
+
+        $data = AutentificadorJWT::ObtenerData($token);
+        $nroDocumento = $data->nroDocumento;
+        $listaDepositos = Deposito::ObtenerTodosDepositos();
+        $listaRetiros = Retiro::ObtenerTodosRetiros();
+        $listaCuentas = Cuenta::ObtenerCuentasPorNroDocumento($nroDocumento);//tengo todas las cuentas con el mismo nro de doc
+
+        $listaDepositosFiltrada = [];
+        $listaRetirosFiltrada = [];
+
+        foreach($listaCuentas as $cuenta)
+        {
+            foreach($listaDepositos as $deposito){
+                if($deposito->nroCuenta == $cuenta->nroCuenta){
+                    $listaDepositosFiltrada[] = $deposito;
+                }
+            }
+            foreach($listaRetiros as $retiro){
+                if($retiro->nroCuenta == $cuenta->nroCuenta){
+                    $listaRetirosFiltrada[] = $retiro;
+                }
+            }
+        }
+
+        $payload = json_encode([
+            "lista_Depositos" => $listaDepositosFiltrada,
+            "lista_Retiros" => $listaRetirosFiltrada
+        ]);
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+        
+    }
     /*
     public function TraerTodos($request, $response, $args)
     {
