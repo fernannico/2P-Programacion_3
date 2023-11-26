@@ -109,8 +109,43 @@ class CuentaController extends Cuenta /*implements IApiUsable*/
         ]);
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
-        
     }
+    
+    public function BajarCuentaController($request, $response, $args)
+    {
+        $parametros = $request->getParsedBody();
+        $nroCuenta = $parametros["nroCuenta"];
+        $estado = "inactiva";
+
+        if(Cuenta::CambiarEstadoCuenta($nroCuenta, $estado)){
+            $retorno = json_encode(array("mensaje" => "estado de la cuenta cambiado: " . $estado));
+        }else{
+            $retorno = json_encode(array("mensaje" => "estado no cambiado"));
+        }
+        $response->getBody()->write($retorno);
+        return $response;
+    }
+
+    public function ModificarCuentaController($request, $response, $args)
+    {
+        $parametros = $request->getParsedBody();
+        $nroCuenta = $parametros["nroCuenta"];
+        $tipoCuenta = $parametros["tipoCuenta"];
+        $nombre =$parametros["nombre"];
+        $apellido =$parametros["apellido"];
+        $nroDocumento =$parametros["nroDocumento"];
+        $mail = $parametros["mail"];
+        $contrasena = $parametros["contrasena"];
+        // $estado = $parametros["estado"];
+        if(Cuenta::ModificarCuenta($nroCuenta,$tipoCuenta,$nombre,$apellido,$nroDocumento,$mail,$contrasena)){
+            $retorno = json_encode(array("mensaje" => "Cuenta modificada: "));
+        }else{
+            $retorno = json_encode(array("mensaje" => "Cuenta no modificada"));
+        }
+        $response->getBody()->write($retorno);
+        return $response;
+    }
+
     /*
     public function TraerTodos($request, $response, $args)
     {

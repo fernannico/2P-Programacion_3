@@ -129,6 +129,58 @@ class Cuenta /*implements JsonSerializable*/{
         return $retorno;
     }
 
+    public static function CambiarEstadoCuenta($nroCuenta, $estado) 
+    {
+        $retorno = false;
+        if(Cuenta::actualizarEstado($nroCuenta, $estado)){
+            $retorno = true;
+        }
+        return $retorno;        
+    }
+
+    public static function ActualizarEstado($nroCuenta, $estado)
+    {
+        $retorno = false;
+        try {
+            //code...
+            $objetoAccesoDato = AccesoDatos::obtenerInstancia();
+            $consulta = $objetoAccesoDato->prepararConsulta("UPDATE cuentas SET estado = :estado WHERE nroCuenta = :nroCuenta");
+            $consulta->bindParam(":nroCuenta", $nroCuenta);
+            $consulta->bindParam(":estado", $estado);
+            $consulta->execute();
+            $retorno = true;
+        } catch (\Throwable $th) {
+            $retorno = false;
+        }
+
+        return $retorno;
+    }
+
+    public static function ModificarCuenta($nroCuenta,$tipoCuenta,$nombre,$apellido,$nroDocumento,$mail,$contrasena)
+    {
+        // $retorno = false;
+        try {
+            //code...
+            $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
+            $consulta =$objetoAccesoDato->prepararConsulta("UPDATE cuentas SET nombre = :nombre, apellido = :apellido, nroDocumento = :nroDocumento, mail = :mail, contrasena = :contrasena WHERE nroCuenta = :nroCuenta AND tipoCuenta = :tipoCuenta");
+            $consulta->bindParam(':nombre', $nombre);
+            $consulta->bindParam(':apellido', $apellido);
+            $consulta->bindParam(':nroDocumento', $nroDocumento);
+            $consulta->bindParam(':mail', $mail);
+            $consulta->bindParam(':contrasena', $contrasena);
+            $consulta->bindParam(':nroCuenta', $nroCuenta);
+            $consulta->bindParam(':tipoCuenta', $tipoCuenta);
+            $consulta->execute();
+            // $filasAfectadas = $consulta->rowCount();
+            // $retorno = $filasAfectadas > 0; // Retorna true si se actualizó al menos una fila
+    
+            $retorno = true;
+        } catch (\Throwable $th) {
+            $retorno = false;
+        }
+        
+        return $retorno;
+    }
     //getter/setter
     // public function GetNroCuenta() {
     //     return $this->nroCuenta;

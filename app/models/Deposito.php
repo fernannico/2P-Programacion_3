@@ -27,6 +27,10 @@
             return $objAccesoDatos->obtenerUltimoId();
         }
 
+        public function GetMonto() {
+            return $this->deposito;
+        }
+
         public static function ObtenerTodosDepositos()
         {
             $objAccesoDatos = AccesoDatos::obtenerInstancia();
@@ -35,6 +39,19 @@
             
             return $consulta->fetchAll(PDO::FETCH_CLASS, 'Deposito');
         }
+
+        public static function ObtenerDepositoPorID($id)
+        {
+            $depositoBuscado = false;
+            $objAccesoDatos = AccesoDatos::obtenerInstancia();
+            $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nroCuenta, tipoCuenta, moneda, deposito, saldo FROM depositos WHERE id = :id");
+            $consulta->bindParam(":id", $id);
+            $consulta->execute();
+            
+            $depositoBuscado = $consulta->fetchObject('Deposito');
+            // var_dump($depositoBuscado);
+            return $depositoBuscado;
+        }   
 
         public static function ObtenerConjuntoFechas($fechaInicio, $fechaFin) {
             $fechas = Array();

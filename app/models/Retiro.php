@@ -27,6 +27,10 @@
             return $objAccesoDatos->obtenerUltimoId();
         }
 
+        public function GetMonto() {
+            return $this->retiro;
+        }
+        
         public static function ObtenerTodosRetiros()
         {
             $objAccesoDatos = AccesoDatos::obtenerInstancia();
@@ -35,6 +39,19 @@
             
             return $consulta->fetchAll(PDO::FETCH_CLASS, 'Retiro');
         }
+
+        public static function ObtenerRetiroPorID($id)
+        {
+            $retiroBuscado = false;
+            $objAccesoDatos = AccesoDatos::obtenerInstancia();
+            $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nroCuenta, tipoCuenta, moneda, retiro, saldo FROM retiros WHERE id = :id");
+            $consulta->bindParam(":id", $id);
+            $consulta->execute();
+            
+            $retiroBuscado = $consulta->fetchObject('Retiro');
+            // var_dump($retiroBuscado);
+            return $retiroBuscado;
+        }   
 
         public static function ObtenerConjuntoFechas($fechaInicio, $fechaFin) {
             $fechas = Array();

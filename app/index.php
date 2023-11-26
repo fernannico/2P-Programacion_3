@@ -15,6 +15,7 @@ require_once './controllers/CuentaController.php';
 require_once './controllers/LoginController.php';
 require_once './controllers/DepositoController.php';
 require_once './controllers/RetiroController.php';
+require_once './controllers/AjusteController.php';
 
 // Instantiate App
 $app = AppFactory::create();
@@ -33,6 +34,8 @@ $app->group('/login', function (RouteCollectorProxy $group) {
 
 $app->group('/cuentas', function (RouteCollectorProxy $group) {
     $group->post('/cargarCuenta', \CuentaController::class . ':CargarCuenta');//val logger, tipo cta, validaciones de usuario repetido
+    $group->put('/modificarCuenta', \CuentaController::class . ':ModificarCuentaController');//val logger, tipo cta, nroCuenta, que coincida nroCuenta con tipo
+    $group->delete('/bajarCuenta', \CuentaController::class . ':BajarCuentaController');//val logger, tipo cta, validaciones de usuario repetido
     //ValidarUsuarioEnJson -> MW para validar usuarios
     //ValidarUsuarioYTipoEnJson -> MW para validar usuarios
 });
@@ -56,15 +59,10 @@ $app->group('/consultas', function (RouteCollectorProxy $group) {
     });
     
     $group->group('/retiros', function (RouteCollectorProxy $group) {
-        //a- El total depositado (monto) por tipo de cuenta y moneda en un día en particular (se envía por parámetro), si no se pasa fecha, se muestran las del día anterior.
         $group->get('/totalRetirado', \RetiroController::class . ':TotalRetiradoController');
-        // b- El listado de depósitos para un usuario en particular.
         $group->get('/retirosUsuario', \RetiroController::class . ':RetirosUsuarioController');
-        // c- El listado de depósitos entre dos fechas ordenado por nombre.
         $group->get('/retirosFechas', \RetiroController::class . ':RetirosFechasOrdenadoController');
-        // d- El listado de depósitos por tipo de cuenta.
         $group->get('/retirosTipoCuenta', \RetiroController::class . ':RetirosTipoCuentaController');
-        // e- El listado de depósitos por moneda.
         $group->get('/retirosMoneda', \RetiroController::class . ':RetirosPorMonedaController');
     });
 });
@@ -72,6 +70,7 @@ $app->group('/consultas', function (RouteCollectorProxy $group) {
 $app->group('/operaciones', function (RouteCollectorProxy $group) {
     $group->post('/deposito', \DepositoController::class . ':CargarDeposito');
     $group->post('/retiro', \RetiroController::class . ':CargarRetiro');
+    $group->post('/ajuste', \AjusteController::class . ':CargarAjuste');
 });
 
 $app->run();
