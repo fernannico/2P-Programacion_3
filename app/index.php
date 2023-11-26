@@ -16,6 +16,8 @@ require_once './controllers/LoginController.php';
 require_once './controllers/DepositoController.php';
 require_once './controllers/RetiroController.php';
 require_once './controllers/AjusteController.php';
+require_once './Middlewares/AuthCuentaMW.php';
+require_once './Middlewares/AuthTipoCuentaMW.php';
 
 // Instantiate App
 $app = AppFactory::create();
@@ -33,9 +35,14 @@ $app->group('/login', function (RouteCollectorProxy $group) {
 });
 
 $app->group('/cuentas', function (RouteCollectorProxy $group) {
-    $group->post('/cargarCuenta', \CuentaController::class . ':CargarCuenta');//val logger, tipo cta, validaciones de usuario repetido
-    $group->put('/modificarCuenta', \CuentaController::class . ':ModificarCuentaController');//val logger, tipo cta, nroCuenta, que coincida nroCuenta con tipo
-    $group->delete('/bajarCuenta', \CuentaController::class . ':BajarCuentaController');//val logger, tipo cta, validaciones de usuario repetido
+    $group->post('/cargarCuenta', \CuentaController::class . ':CargarCuenta')//val logger, tipo cta, validaciones de usuario repetido
+        ->add(\AuthTipoCuentaMW::class);            //validar el tipo de cuenta
+    ;
+    $group->put('/modificarCuenta', \CuentaController::class . ':ModificarCuentaController')//val logger, tipo cta, nroCuenta, que coincida nroCuenta con tipo
+        ->add(\AuthCuentaMW::class)
+        ->add(\AuthTipoCuentaMW::class);            //validar el tipo de cuenta
+    $group->delete('/bajarCuenta', \CuentaController::class . ':BajarCuentaController')//val logger, tipo cta, validaciones de usuario repetido
+        ->add(\AuthCuentaMW::class);
     //ValidarUsuarioEnJson -> MW para validar usuarios
     //ValidarUsuarioYTipoEnJson -> MW para validar usuarios
 });
@@ -53,7 +60,8 @@ $app->group('/consultas', function (RouteCollectorProxy $group) {
         // c- El listado de depósitos entre dos fechas ordenado por nombre.
         $group->get('/depositosFechas', \DepositoController::class . ':DepositosFechasOrdenadoController');
         // d- El listado de depósitos por tipo de cuenta.
-        $group->get('/depositosTipoCuenta', \DepositoController::class . ':DepositosTipoCuentaController');
+        $group->get('/depositosTipoCuenta', \DepositoController::class . ':DepositosTipoCuentaController')
+            ->add(\AuthTipoCuentaMW::class);            //validar el tipo de cuenta
         // e- El listado de depósitos por moneda.
         $group->get('/depositosMoneda', \DepositoController::class . ':DepositosPorMonedaController');
     });
@@ -62,13 +70,16 @@ $app->group('/consultas', function (RouteCollectorProxy $group) {
         $group->get('/totalRetirado', \RetiroController::class . ':TotalRetiradoController');
         $group->get('/retirosUsuario', \RetiroController::class . ':RetirosUsuarioController');
         $group->get('/retirosFechas', \RetiroController::class . ':RetirosFechasOrdenadoController');
-        $group->get('/retirosTipoCuenta', \RetiroController::class . ':RetirosTipoCuentaController');
+        $group->get('/retirosTipoCuenta', \RetiroController::class . ':RetirosTipoCuentaController')
+            ->add(\AuthTipoCuentaMW::class);            //validar el tipo de cuenta
         $group->get('/retirosMoneda', \RetiroController::class . ':RetirosPorMonedaController');
     });
 });
 
 $app->group('/operaciones', function (RouteCollectorProxy $group) {
-    $group->post('/deposito', \DepositoController::class . ':CargarDeposito');
+    $group->post('/deposito', \DepositoController::class . ':CargarDeposito')
+        ->add(\AuthCuentaMW::class);
+        //habra qie validar que la cuenta ingresada corresponda al usuario logueado (si el nro cuenta correponde al dni)
     $group->post('/retiro', \RetiroController::class . ':CargarRetiro');
     $group->post('/ajuste', \AjusteController::class . ':CargarAjuste');
 });

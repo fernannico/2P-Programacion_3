@@ -127,6 +127,11 @@ class CuentaController extends Cuenta /*implements IApiUsable*/
         $estado = "inactiva";
 
         if(Cuenta::CambiarEstadoCuenta($nroCuenta, $estado)){
+            $cuenta = Cuenta::ObtenerCuentaPorNroCuenta($nroCuenta);
+            $nombre_imagen = $nroCuenta . $cuenta->tipoCuenta . ".jpg";
+            $carpetaOrigen = "ImagenesDeCuentas/2023/";
+            $carpetaDestino = "ImagenesBackupCuentas/2023/";        
+            Cuenta::MoverImagen($nombre_imagen,$carpetaOrigen,$carpetaDestino);
             $retorno = json_encode(array("mensaje" => "estado de la cuenta cambiado: " . $estado));
         }else{
             $retorno = json_encode(array("mensaje" => "estado no cambiado"));

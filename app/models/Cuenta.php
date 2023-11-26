@@ -51,13 +51,34 @@ class Cuenta /*implements JsonSerializable*/{
         $retorno = false;
         $carpeta_archivos = $directorioDestino;
         $ultimoNroCuenta = (int)Cuenta::ObtenerUltimoNroCuenta();
-        $nroCuenta = ($ultimoNroCuenta+1);
+        $nroCuenta = ($ultimoNroCuenta);
         $nombre_archivo = $nroCuenta . $this->tipoCuenta . ".jpg";       
         $ruta_destino = $carpeta_archivos . $nombre_archivo;
 
         if (move_uploaded_file($nombreImagen,  $ruta_destino)){
             $retorno = true;
         }     
+        return $retorno;
+    }
+
+    public static function MoverImagen($nombreImagen,$carpetaOrigen,$directorioDestino) {
+        $retorno = false;
+        // $nombreImagen = $nombreArchivo; 
+
+        $rutaOrigen = $carpetaOrigen . $nombreImagen;
+        $rutaDestino = $directorioDestino . $nombreImagen;
+
+        if (file_exists($rutaOrigen)) {
+            try {
+                if (rename($rutaOrigen, $rutaDestino)) {
+                    $retorno = true;
+                }
+            } finally {
+                // Manejar la excepción si ocurre algún error al mover el archivo
+                $retorno = false;
+            }
+        }
+    
         return $retorno;
     }
 
