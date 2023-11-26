@@ -8,11 +8,12 @@
         public $moneda;
         public $deposito;
         public $saldo;
+        public $imagen;
 
         public function crearDeposito()
         {
             $objAccesoDatos = AccesoDatos::obtenerInstancia();
-            $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO depositos (nroCuenta, tipoCuenta, moneda, deposito, saldo) VALUES (:nroCuenta,:tipoCuenta,:moneda,:deposito,:saldo)");
+            $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO depositos (nroCuenta, tipoCuenta, moneda, deposito, saldo,imagen) VALUES (:nroCuenta,:tipoCuenta,:moneda,:deposito,:saldo,:imagen)");
 
             // $consulta->bindParam(':id', $this->nombre);
             // $consulta->bindParam(':fecha', $this->apellido);
@@ -21,6 +22,7 @@
             $consulta->bindParam(':moneda', $this->moneda);
             $consulta->bindParam(':deposito', $this->deposito);
             $consulta->bindParam(':saldo', $this->saldo);
+            $consulta->bindParam(':imagen', $this->imagen);
 
             $consulta->execute();
 
@@ -31,6 +33,21 @@
             return $this->deposito;
         }
 
+        public function GuardarImagen($nombreImagen) {
+            $retorno = false;
+            $carpeta_archivos = "ImagenesDeDepositos2023/";
+            $ultimoId = (int)Deposito::ObtenerUltimoId();
+            $id = ($ultimoId+1);
+    
+            $nombre_archivo = $this->tipoCuenta . "_" . $this->nroCuenta . "_" . $id . ".jpg";       
+            $ruta_destino = $carpeta_archivos . $nombre_archivo;
+    
+            if (move_uploaded_file($nombreImagen,  $ruta_destino)){
+                $retorno = true;
+            }     
+            return $retorno;
+        }
+        
         public static function ObtenerTodosDepositos()
         {
             $objAccesoDatos = AccesoDatos::obtenerInstancia();
@@ -52,7 +69,19 @@
             // var_dump($depositoBuscado);
             return $depositoBuscado;
         }   
-
+        public static function ObtenerUltimoId()
+        {
+            $objAccesoDatos = AccesoDatos::obtenerInstancia();
+    
+            $consulta = $objAccesoDatos->prepararConsulta("SELECT MAX(id) AS ultimo_id FROM depositos");
+            $consulta->execute();
+        
+            $resultado = $consulta->fetch(PDO::FETCH_ASSOC); 
+            $ultimo_id = $resultado['ultimo_id']; 
+            
+            return $ultimo_id;
+        }
+        
         public static function ObtenerConjuntoFechas($fechaInicio, $fechaFin) {
             $fechas = Array();
         

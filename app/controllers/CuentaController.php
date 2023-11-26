@@ -1,4 +1,6 @@
 <?php
+
+
 require_once './models/Cuenta.php';
 require_once './models/Retiro.php';
 require_once './models/Deposito.php';
@@ -18,9 +20,12 @@ class CuentaController extends Cuenta /*implements IApiUsable*/
         $mail = $parametros['mail'];
         $contrasena = $parametros['contrasena'];
         $tipoCuenta = $parametros['tipoCuenta'];
-        $moneda = Cuenta::ObtenerMonedaPorCuenta($tipoCuenta);             
+        $nombreImagen = $_FILES['imagen']['tmp_name'];
+        $directorioImagenesAlta = "ImagenesDeCuentas/2023/";
+        $moneda = Cuenta::ObtenerMonedaPorCuenta($tipoCuenta);          
+        
         // $saldo = $parametros['saldo'];               ver que hacer porque es 0 por defecto pero CREO q puede crearse con algo de $ ya
-
+        
         // Creamos el cuenta
         $cuenta = new Cuenta();
         $cuenta->nombre = $nombre;
@@ -30,9 +35,13 @@ class CuentaController extends Cuenta /*implements IApiUsable*/
         $cuenta->contrasena = $contrasena;
         $cuenta->tipoCuenta = $tipoCuenta;
         $cuenta->moneda = $moneda;
-        // $cuenta->saldo = $saldo;
+        $ultimoNroCuenta = (int)Cuenta::ObtenerUltimoNroCuenta();
+        $nombre_imagen = ($ultimoNroCuenta+1) . $tipoCuenta . ".jpg";       
+        $cuenta->imagen = $nombre_imagen;
         $cuenta->crearCuenta();
-        var_dump($cuenta);
+
+        $cuenta->GuardarImagen($nombreImagen,$directorioImagenesAlta);
+        // var_dump($cuenta);
 
         $payload = json_encode(array("mensaje" => "Cuenta creado con exito"));
 

@@ -2,16 +2,17 @@
 
 class Cuenta /*implements JsonSerializable*/{
     public $nroCuenta;
-    public $nombre;
-    public $apellido;
-    public $tipoDocumento;
-    public $nroDocumento;
-    public $mail;
-    public $contrasena;
+    public $nombre;             //usr
+    public $apellido;           //usr
+    public $tipoDocumento;      //usr
+    public $nroDocumento;       //usr
+    public $mail;               //usr
+    public $contrasena;         //usr
     public $tipoCuenta;
     public $moneda;
     public $saldo;
     public $estado;
+    public $imagen;
 
     // public function __construct($nroCuenta='',$nombre='',$apellido='',$tipoDocumento='',$nroDocumento='',$mail='',$contrasena='',$tipoCuenta='',$moneda='',$saldo= '',$estado = '') {
     //     $this->nroCuenta = $nroCuenta;
@@ -30,7 +31,7 @@ class Cuenta /*implements JsonSerializable*/{
     public function CrearCuenta()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO cuentas (nombre,apellido,nroDocumento,mail,contrasena,tipoCuenta,moneda) VALUES (:nombre,:apellido,:nroDocumento,:mail,:contrasena,:tipoCuenta,:moneda)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO cuentas (nombre,apellido,nroDocumento,mail,contrasena,tipoCuenta,moneda,imagen) VALUES (:nombre,:apellido,:nroDocumento,:mail,:contrasena,:tipoCuenta,:moneda,:imagen)");
 
         $consulta->bindParam(':nombre', $this->nombre);
         $consulta->bindParam(':apellido', $this->apellido);
@@ -39,10 +40,25 @@ class Cuenta /*implements JsonSerializable*/{
         $consulta->bindParam(':contrasena', $this->contrasena);
         $consulta->bindParam(':tipoCuenta', $this->tipoCuenta);
         $consulta->bindParam(':moneda', $this->moneda);
+        $consulta->bindParam(':imagen', $this->imagen);
 
         $consulta->execute();
 
         return $objAccesoDatos->obtenerUltimoId();
+    }
+
+    public function GuardarImagen($nombreImagen,$directorioDestino) {
+        $retorno = false;
+        $carpeta_archivos = $directorioDestino;
+        $ultimoNroCuenta = (int)Cuenta::ObtenerUltimoNroCuenta();
+        $nroCuenta = ($ultimoNroCuenta+1);
+        $nombre_archivo = $nroCuenta . $this->tipoCuenta . ".jpg";       
+        $ruta_destino = $carpeta_archivos . $nombre_archivo;
+
+        if (move_uploaded_file($nombreImagen,  $ruta_destino)){
+            $retorno = true;
+        }     
+        return $retorno;
     }
 
     public static function ObtenerMonedaPorCuenta($tipoCuenta)
@@ -80,7 +96,6 @@ class Cuenta /*implements JsonSerializable*/{
         $consulta->execute();
         
         $cuentasEncontradas = $consulta->fetchAll(PDO::FETCH_CLASS, 'Cuenta');
-        // var_dump($cuentasEncontradas);
         return $cuentasEncontradas;
     }   
 
@@ -107,6 +122,19 @@ class Cuenta /*implements JsonSerializable*/{
         
         $saldo = $consulta->fetchColumn();
         return $saldo;
+    }
+
+    public static function ObtenerUltimoNroCuenta()
+    {
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT MAX(nroCuenta) AS ultimo_nroCuenta FROM cuentas");
+        $consulta->execute();
+    
+        $resultado = $consulta->fetch(PDO::FETCH_ASSOC); // Obtener el resultado como un array asociativo
+        $ultimo_nroCuenta = $resultado['ultimo_nroCuenta']; // Capturar el valor del último ID
+        
+        return $ultimo_nroCuenta;
     }
 
     public static function ActualizarSaldo($nroCuenta, $monto)

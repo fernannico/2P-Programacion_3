@@ -28,10 +28,13 @@ class DepositoController extends Deposito /*implements IApiUsable*/
         $depositoNuevo->moneda = $moneda;
         $depositoNuevo->deposito = $deposito;
         $depositoNuevo->saldo = $saldo + $deposito;
+        $ultimoId = (int)Deposito::ObtenerUltimoId() + 1;
+        $nombre_imagen = $tipoCuenta . "_" . $nroCuenta . "_" . $ultimoId . ".jpg";          
+        $depositoNuevo->imagen = $nombre_imagen;
         $depositoNuevo->crearDeposito();
 
         Cuenta::ActualizarSaldo($nroCuenta,$deposito);
-        // var_dump($deposito);
+        $depositoNuevo->GuardarImagen($_FILES['imagen']['tmp_name']);
 
         $payload = json_encode(array("mensaje" => "Deposito creado con exito"));
 
