@@ -23,15 +23,17 @@ class CuentaController extends Cuenta /*implements IApiUsable*/
         
         $estadoCuenta = $parametros['estadoCuenta'];
         if ($estadoCuenta === 'actualizar') {
-            // Lógica para actualizar una cuenta existente
+            // actualizar una cuenta existente
             $cuentaActualizar = Cuenta::ObtenerCuentaPorDniTipo($nroDocumento,$tipoCuenta);
             if($cuentaActualizar){
                 Cuenta::ActualizarSaldo($cuentaActualizar->nroCuenta,$saldo);
+                // Cuenta::ActualizarEstado($cuentaActualizar->nroCuenta,"activa");
                 $cuentaActualizar->saldo += $saldo;
-                $payload = json_encode(array("mensaje" => "Saldo de la cuenta actualizado con exito <br>" . $cuentaActualizar->__toString()));
+                // $cuentaActualizar->estado = "activa";
+                $payload = json_encode(array("mensaje" => "Cuenta actualizado con exito <br>" . $cuentaActualizar->__toString()));
             }
         }elseif ($estadoCuenta === 'nueva') {
-            // Lógica para crear una nueva cuenta
+            // crear una nueva cuenta
             $nombre = $parametros['nombre'];
             $apellido = $parametros['apellido'];
             $mail = $parametros['mail'];

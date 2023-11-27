@@ -114,17 +114,6 @@ class Deposito {
 
         return $depositosEntreFechas;
     }
-    public static function CompararPorNumeroDeCuenta($a, $b){
-        if ($a->nroCuenta == $b->nroCuenta) {
-            return 0;
-        }
-        return ($a->nroCuenta < $b->nroCuenta) ? -1 : 1;
-    }
-    
-    public static function OrdenarDepositosPorNumeroCuenta($depositos){
-        usort($depositos, 'Deposito::CompararPorNumeroDeCuenta');
-        return $depositos;
-    }
 
     public function __toString() {
         return 

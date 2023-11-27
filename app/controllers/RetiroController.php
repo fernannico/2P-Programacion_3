@@ -115,7 +115,7 @@ class RetiroController extends Retiro /*implements IApiUsable*/
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }
-
+/*
     public function RetirosFechasOrdenadoController($request, $response, $args)
     {
         $queryParams = $request->getQueryParams();
@@ -132,6 +132,43 @@ class RetiroController extends Retiro /*implements IApiUsable*/
             $payload = json_encode(array("lista_retiros:" => $retiros));
         }else {
             echo "<br>no hay retiros entre estas fechas";
+        }
+        
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+*/
+
+    public function RetirosFechasOrdenadoController($request, $response, $args)
+    {
+        $queryParams = $request->getQueryParams();
+        $fechaInicio = $queryParams["fechaInicio"];
+        $fechaFin = $queryParams["fechaFin"];
+
+        $retirosEntreFechas = Retiro::ObtenerRetirosEntreFechas($fechaInicio, $fechaFin);
+
+        $cuentasRetiros = [];
+        foreach ($retirosEntreFechas as $retiro) {
+            $cuenta = Cuenta::ObtenerCuentaPorNroCuenta($retiro->nroCuenta); 
+            if ($cuenta) {
+                $cuentasRetiros[$retiro->id] = $cuenta; 
+            }
+        }
+
+        // Ordenar retiros por nombre y apellido de las cuentas
+        usort($retirosEntreFechas, function ($a, $b) use ($cuentasRetiros) {
+            $cuentaA = $cuentasRetiros[$a->id];
+            $cuentaB = $cuentasRetiros[$b->id];
+            // Comparación 
+            $resultado = strcmp($cuentaA->nombre . $cuentaA->apellido, $cuentaB->nombre . $cuentaB->apellido);
+            
+            return $resultado;
+        });
+
+        if (!empty($retirosEntreFechas)) {
+            $payload = json_encode(array("lista_retiros" => $retirosEntreFechas));
+        } else {
+            $payload = json_encode(array("mensaje" => "No hay retiros entre estas fechas"));
         }
         
         $response->getBody()->write($payload);

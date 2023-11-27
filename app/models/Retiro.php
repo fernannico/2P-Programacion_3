@@ -99,17 +99,7 @@
     
             return $retirosEntreFechas;
         }
-        public static function CompararPorNumeroDeCuenta($a, $b){
-            if ($a->nroCuenta == $b->nroCuenta) {
-                return 0;
-            }
-            return ($a->nroCuenta < $b->nroCuenta) ? -1 : 1;
-        }
         
-        public static function OrdenarRetirosPorNumeroCuenta($retiros){
-            usort($retiros, 'Retiro::CompararPorNumeroDeCuenta');
-            return $retiros;
-        }
         public function __toString() {
             return 
             "<br>id " . $this->id .

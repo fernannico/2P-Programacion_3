@@ -112,7 +112,7 @@ class DepositoController extends Deposito /*implements IApiUsable*/
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }
-
+/*
     public function DepositosFechasOrdenadoController($request, $response, $args)
     {
         $queryParams = $request->getQueryParams();
@@ -128,6 +128,41 @@ class DepositoController extends Deposito /*implements IApiUsable*/
             $payload = json_encode(array("lista_depositos:" => $depositos));
         }else {
             echo "<br>no hay depositos entre estas fechas";
+        }
+        
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+    }*/
+    public function DepositosFechasOrdenadoController($request, $response, $args)
+    {
+        $queryParams = $request->getQueryParams();
+        $fechaInicio = $queryParams["fechaInicio"];
+        $fechaFin = $queryParams["fechaFin"];
+
+        $depositosEntreFechas = Deposito::ObtenerDepositosEntreFechas($fechaInicio, $fechaFin);
+
+        $cuentasDepositos = [];
+        foreach ($depositosEntreFechas as $deposito) {
+            $cuenta = Cuenta::ObtenerCuentaPorNroCuenta($deposito->nroCuenta); 
+            if ($cuenta) {
+                $cuentasDepositos[$deposito->id] = $cuenta; 
+            }
+        }
+
+        // Ordenar depósitos por nombre y apellido de las cuentas
+        usort($depositosEntreFechas, function ($a, $b) use ($cuentasDepositos) {
+            $cuentaA = $cuentasDepositos[$a->id];
+            $cuentaB = $cuentasDepositos[$b->id];
+            // Comparación 
+            $resultado = strcmp($cuentaA->nombre . $cuentaA->apellido, $cuentaB->nombre . $cuentaB->apellido);
+            
+            return $resultado;
+        });
+
+        if (!empty($depositosEntreFechas)) {
+            $payload = json_encode(array("lista_depositos" => $depositosEntreFechas));
+        } else {
+            $payload = json_encode(array("mensaje" => "No hay depósitos entre estas fechas"));
         }
         
         $response->getBody()->write($payload);
