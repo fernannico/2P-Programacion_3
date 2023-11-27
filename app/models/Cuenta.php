@@ -243,10 +243,10 @@ class Cuenta {
             $consulta->bindParam(':nroCuenta', $nroCuenta);
             $consulta->bindParam(':tipoCuenta', $tipoCuenta);
             $consulta->execute();
-            // $filasAfectadas = $consulta->rowCount();
-            // $retorno = $filasAfectadas > 0; // Retorna true si se actualizó al menos una fila
+            $filasAfectadas = $consulta->rowCount();
+            $retorno = $filasAfectadas > 0; // Retorna true si se actualizó al menos una fila
     
-            $retorno = true;
+            // $retorno = true;
         } catch (\Throwable $th) {
             $retorno = false;
         }

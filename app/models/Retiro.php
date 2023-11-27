@@ -53,6 +53,19 @@
             return $retiroBuscado;
         }   
 
+        public static function ObtenerUltimoId()
+        {
+            $objAccesoDatos = AccesoDatos::obtenerInstancia();
+    
+            $consulta = $objAccesoDatos->prepararConsulta("SELECT MAX(id) AS ultimo_id FROM retiros");
+            $consulta->execute();
+        
+            $resultado = $consulta->fetch(PDO::FETCH_ASSOC); 
+            $ultimo_id = $resultado['ultimo_id']; 
+            
+            return $ultimo_id;
+        }
+
         public static function ObtenerConjuntoFechas($fechaInicio, $fechaFin) {
             $fechas = Array();
         
@@ -99,8 +112,8 @@
         }
         public function __toString() {
             return 
-            // "id " . $this->id .
-            // "<br>fecha: " . $this->fecha .
+            "<br>id " . $this->id .
+            "<br>fecha: " . $this->fecha .
             "<br>nroCuenta: " . $this->nroCuenta .
             "<br>tipoCuenta: " . $this->tipoCuenta .
             "<br>moneda: " . $this->moneda .

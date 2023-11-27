@@ -38,7 +38,9 @@ class RetiroController extends Retiro /*implements IApiUsable*/
             $retiro = $retiro * -1;
             Cuenta::ActualizarSaldo($nroCuenta,$retiro);
             // var_dump($retiro);
-    
+            $ultimoId = (int)Retiro::ObtenerUltimoId();
+            $retiroNuevo->id = $ultimoId;
+            $retiroNuevo->fecha = date("d-m-Y H:i:s");
             $payload = json_encode(array("mensaje" => "Retiro creado con exito <br>" . $retiroNuevo->__toString()));
         }
 

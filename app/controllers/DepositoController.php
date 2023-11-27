@@ -38,7 +38,8 @@ class DepositoController extends Deposito /*implements IApiUsable*/
 
         Cuenta::ActualizarSaldo($nroCuenta,$deposito);
         $depositoNuevo->GuardarImagen($_FILES['imagen']['tmp_name']);
-
+        $depositoNuevo->id = $ultimoId;
+        $depositoNuevo->fecha = date("d-m-Y H:i:s");
         $payload = json_encode(array("mensaje" => "Deposito creado con exito<br>". $depositoNuevo->__toString()));
 
         $response->getBody()->write($payload);

@@ -21,8 +21,10 @@ class AuthDniNombreAellido {
             }
         }
 
-        $listaCuentasDni = Cuenta::ObtenerCuentasPorNroDocumento($nroDocumento);
-        $cuenta = $listaCuentasDni[0];
+        if($dniExiste){
+            $listaCuentasDni = Cuenta::ObtenerCuentasPorNroDocumento($nroDocumento);
+            $cuenta = $listaCuentasDni[0];
+        }
 
         if($dniExiste == false){
             $response = $handler->handle($request);

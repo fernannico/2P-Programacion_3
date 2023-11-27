@@ -56,8 +56,9 @@ class CuentaController extends Cuenta /*implements IApiUsable*/
             $cuenta->crearCuenta();
 
             $cuenta->GuardarImagen($nombreImagen,$directorioImagenesAlta);
+            $cuentaNueva = Cuenta::ObtenerCuentaPorNroCuenta($ultimoNroCuenta+1);
 
-            $payload = json_encode(array("mensaje" => "Cuenta creado con exito"));
+            $payload = json_encode(array("mensaje" => "Cuenta creado con exito<BR>" . $cuentaNueva->__toString()));
         }
     
         $response->getBody()->write($payload);
@@ -107,13 +108,13 @@ class CuentaController extends Cuenta /*implements IApiUsable*/
 
     public static function ConsultarOperacionesController($request, $response, $args)
     {
-        // $header = $request->getHeaderLine('Authorization');
-        // $token = trim(explode("Bearer", $header)[1]);
+        $header = $request->getHeaderLine('Authorization');
+        $token = trim(explode("Bearer", $header)[1]);
 
-        // $data = AutentificadorJWT::ObtenerData($token);
-        // $nroDocumento = $data->nroDocumento;
-        $queryParams = $request->getQueryParams();
-        $nroDocumento = $queryParams['nroDocumento'];
+        $data = AutentificadorJWT::ObtenerData($token);
+        $nroDocumento = $data->nroDocumento;
+        // $queryParams = $request->getQueryParams();
+        // $nroDocumento = $queryParams['nroDocumento'];
 
         $listaDepositos = Deposito::ObtenerTodosDepositos();
         $listaRetiros = Retiro::ObtenerTodosRetiros();
@@ -177,9 +178,10 @@ class CuentaController extends Cuenta /*implements IApiUsable*/
         // $estado = $parametros["estado"];
         if(Cuenta::ModificarCuenta($nroCuenta,$tipoCuenta,$nombre,$apellido,$nroDocumento,$mail,$contrasena)){
             $cuentaModificada = Cuenta::ObtenerCuentaPorNroCuenta($nroCuenta);
-            $retorno = json_encode(array("mensaje" => "Cuenta modificada: <br>" . $cuentaModificada->__toString()));
+            
+            $retorno = json_encode(array("mensaje" => "Cuenta modificada: <br>" . $cuentaModificada->__toString() . "<br><br>Por favor, vuelva a iniciar sesion"));
         }else{
-            $retorno = json_encode(array("mensaje" => "Cuenta no modificada"));
+            $retorno = json_encode(array("mensaje" => "Cuenta no modificada, no coinciden nroCuenta con el tipoCuenta"));
         }
         $response->getBody()->write($retorno);
         return $response;

@@ -128,8 +128,8 @@ class Deposito {
 
     public function __toString() {
         return 
-        // "id " . $this->id .
-        // "<br>fecha: " . $this->fecha .
+        "<br>id " . $this->id .
+        "<br>fecha: " . $this->fecha .
         "<br>nroCuenta: " . $this->nroCuenta .
         "<br>tipoCuenta: " . $this->tipoCuenta .
         "<br>moneda: " . $this->moneda .
