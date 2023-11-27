@@ -110,13 +110,14 @@ class CuentaController extends Cuenta /*implements IApiUsable*/
 
     public static function ConsultarOperacionesController($request, $response, $args)
     {
-        $header = $request->getHeaderLine('Authorization');
-        $token = trim(explode("Bearer", $header)[1]);
+        // $header = $request->getHeaderLine('Authorization');
+        // $token = trim(explode("Bearer", $header)[1]);
 
-        $data = AutentificadorJWT::ObtenerData($token);
-        $nroDocumento = $data->nroDocumento;
-        // $queryParams = $request->getQueryParams();
-        // $nroDocumento = $queryParams['nroDocumento'];
+        // $data = AutentificadorJWT::ObtenerData($token);
+        // $nroDocumento = $data->nroDocumento;
+
+        $queryParams = $request->getQueryParams();
+        $nroDocumento = $queryParams['nroDocumento'];
 
         $listaDepositos = Deposito::ObtenerTodosDepositos();
         $listaRetiros = Retiro::ObtenerTodosRetiros();

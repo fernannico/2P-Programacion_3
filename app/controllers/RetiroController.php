@@ -92,13 +92,16 @@ class RetiroController extends Retiro /*implements IApiUsable*/
 
     public function RetirosUsuarioController($request, $response, $args)
     {
-        $header = $request->getHeaderLine('Authorization');
-        $token = trim(explode("Bearer", $header)[1]);
+        // $header = $request->getHeaderLine('Authorization');
+        // $token = trim(explode("Bearer", $header)[1]);
 
-        $data = AutentificadorJWT::ObtenerData($token);
-        // var_dump($data->nroDocumento);
-        $nroDocumento = $data->nroDocumento;
+        // $data = AutentificadorJWT::ObtenerData($token);
+        // // var_dump($data->nroDocumento);
+        // $nroDocumento = $data->nroDocumento;
         // $nroCuenta = $data->nroCuenta;
+        $queryParams = $request->getQueryParams();
+        $nroDocumento = $queryParams['nroDocumento'];
+
         $listaRetiros = Retiro::ObtenerTodosRetiros();
         $listaCuentas = Cuenta::ObtenerCuentasPorNroDocumento($nroDocumento);//tengo todas las cuentas con el mismo nro de doc
 

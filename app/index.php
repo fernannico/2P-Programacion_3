@@ -11,6 +11,7 @@ use Slim\Routing\RouteCollectorProxy;
 require __DIR__ . '/../vendor/autoload.php';
 require_once './db/AccesoDatos.php';
 require_once './JWT/AuthJWT.php';
+require_once './controllers/UsuarioController.php';
 require_once './controllers/CuentaController.php';
 require_once './controllers/LoginController.php';
 require_once './controllers/DepositoController.php';
@@ -26,6 +27,9 @@ require_once './Middlewares/AuthTipoCuentaMW.php';
 require_once './Middlewares/AuthMonedaMW.php';
 require_once './Middlewares/AuthFechaMW.php';
 require_once './Middlewares/AuthDniMW.php';
+require_once './Middlewares/AuthRolMW.php';
+require_once './Middlewares/AuthRolLoginMW.php';
+require_once './Middlewares/LoggerMW.php';
 
 // Instantiate App
 $app = AppFactory::create();
@@ -39,8 +43,10 @@ $app->addBodyParsingMiddleware();
 //http://localhost/2P-Programacion_3/app/
 
 $app->group('/usuario', function (RouteCollectorProxy $group) {
+    $group->post('/cargarUsuario', \UsuarioController::class . ':CargarCuenta')
+        ->add(\AuthRolMW::class);
     $group->post('/login', \LoginController::class . ':LoginController');
-});
+})->add(\LoggerMW::class); 
 
 $app->group('/cuentas', function (RouteCollectorProxy $group) {
     $group->post('/cargarCuenta', \CuentaController::class . ':CargarCuenta')
@@ -49,32 +55,37 @@ $app->group('/cuentas', function (RouteCollectorProxy $group) {
         ->add(\AuthTipoCuentaMW::class);            //validar el tipo de cuenta
     $group->put('/modificarCuenta', \CuentaController::class . ':ModificarCuentaController')
         // ->add(\AuthDniNombreAellido::class)         //validar si ya existe el dni y corresponde al mismo nombre y apellido
-        ->add(\AuthCuentasUsuario::class)           //valida que el nro de cuenta ingresado sea del usuario logueado
+        // ->add(\AuthCuentasUsuario::class)           //valida que el nro de cuenta ingresado sea del usuario logueado
         ->add(\AuthCuentaMW::class)                 //valida que exista en nroCuenta en la talba de cuentas
         ->add(\AuthTipoCuentaMW::class);            //validar el tipo de cuenta
     $group->delete('/bajarCuenta', \CuentaController::class . ':BajarCuentaController')
-        ->add(\AuthCuentasUsuario::class)           //valida que el nro de cuenta ingresado sea del usuario logueado
+        // ->add(\AuthCuentasUsuario::class)           //valida que el nro de cuenta ingresado sea del usuario logueado
         ->add(\AuthCuentaMW::class);                //valida que exista el nroCuenta en la talba de cuentas
-})->add(\ValidarLoginMW::class);                    //valida que exista el token (logueado)
+})->add(\ValidarLoginMW::class)->add(\LoggerMW::class);;                    //valida que exista el token (logueado)
     
 $app->group('/operaciones', function (RouteCollectorProxy $group) {
     $group->post('/deposito', \DepositoController::class . ':CargarDeposito')
         ->add(\AuthNroCtaTipoCta::class)            //validar match entre el tipo de cuenta con el nro de cuenta
         ->add(\AuthTipoCuentaMW::class)             //validar el tipo de cuenta
         ->add(\AuthCuentaMW::class)                //valida que exista en nroCuenta en la talba de cuentas
-        ->add(\AuthCuentasUsuario::class);           //valida que el nro de cuenta ingresado sea del usuario logueado
+        ->add(new AuthRolLoginMW("cajero"));     //validar el sector
+        // ->add(\AuthCuentasUsuario::class);           //valida que el nro de cuenta ingresado sea del usuario logueado
     $group->post('/retiro', \RetiroController::class . ':CargarRetiro')
         ->add(\AuthNroCtaTipoCta::class)            //validar match entre el tipo de cuenta con el nro de cuenta
         ->add(\AuthTipoCuentaMW::class)             //validar el tipo de cuenta
-        ->add(\AuthCuentaMW::class)                //valida que exista en nroCuenta en la talba de cuentas    
-        ->add(\AuthCuentasUsuario::class);           //valida que el nro de cuenta ingresado sea del usuario logueado
-    $group->post('/ajuste', \AjusteController::class . ':CargarAjuste');
-})->add(\ValidarLoginMW::class);           
+        ->add(new AuthRolLoginMW("cajero"))     //validar el sector
+        ->add(\AuthCuentaMW::class);                //valida que exista en nroCuenta en la talba de cuentas    
+        // ->add(\AuthCuentasUsuario::class);           //valida que el nro de cuenta ingresado sea del usuario logueado
+    $group->post('/ajuste', \AjusteController::class . ':CargarAjuste')
+        // ->add(\AuthRolLoginMW::class);
+        ->add(new AuthRolLoginMW("supervisor"));     //validar el sector
+
+})->add(\ValidarLoginMW::class)->add(\LoggerMW::class);;           
         
 $app->group('/consultas', function (RouteCollectorProxy $group) {
     $group->post('/consultarCuenta', \CuentaController::class . ':ConsultarCuentaController')
         ->add(\AuthTipoCuentaMW::class)             //validar el tipo de cuenta
-        ->add(\AuthCuentasUsuario::class)           //valida que el nro de cuenta ingresado sea del usuario logueado
+        // ->add(\AuthCuentasUsuario::class)           //valida que el nro de cuenta ingresado sea del usuario logueado
         ->add(\AuthNroCtaTipoCta::class)            //validar match entre el tipo de cuenta con el nro de cuenta
         ->add(\AuthCuentaMW::class);                //valida que exista en nroCuenta en la talba de cuentas
     
@@ -106,7 +117,7 @@ $app->group('/consultas', function (RouteCollectorProxy $group) {
         $group->get('/retirosMoneda', \RetiroController::class . ':RetirosPorMonedaController')
             ->add(\AuthMonedaMW::class);            //validar el tipo de moneda
     });
-})->add(\ValidarLoginMW::class);
+})->add(\ValidarLoginMW::class)->add(new AuthRolLoginMW("operador"))->add(\LoggerMW::class);;
 
 $app->run();
 ?>

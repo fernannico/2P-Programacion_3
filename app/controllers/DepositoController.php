@@ -90,11 +90,14 @@ class DepositoController extends Deposito /*implements IApiUsable*/
 
     public function DepositosUsuarioController($request, $response, $args)
     {
-        $header = $request->getHeaderLine('Authorization');
-        $token = trim(explode("Bearer", $header)[1]);
+        // $header = $request->getHeaderLine('Authorization');
+        // $token = trim(explode("Bearer", $header)[1]);
 
-        $data = AutentificadorJWT::ObtenerData($token);
-        $nroDocumento = $data->nroDocumento;
+        // $data = AutentificadorJWT::ObtenerData($token);
+        // $nroDocumento = $data->nroDocumento;
+        $queryParams = $request->getQueryParams();
+        $nroDocumento = $queryParams['nroDocumento'];
+
         // $nroCuenta = $data->nroCuenta;
         $listaDepositos = Deposito::ObtenerTodosDepositos();
         $listaCuentas = Cuenta::ObtenerCuentasPorNroDocumento($nroDocumento);//tengo todas las cuentas con el mismo nro de doc
