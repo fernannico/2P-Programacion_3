@@ -9,17 +9,20 @@ class DepositoController extends Deposito /*implements IApiUsable*/
     public function CargarDeposito($request, $response, $args)
     {
         
-        $header = $request->getHeaderLine('Authorization');
-        $token = trim(explode("Bearer", $header)[1]);
+        // $header = $request->getHeaderLine('Authorization');
+        // $token = trim(explode("Bearer", $header)[1]);
         
-        $data = AutentificadorJWT::ObtenerData($token);
-        $nroCuenta = $data->nroCuenta;
-        $tipoCuenta = $data->tipoCuenta;
-        $moneda = Cuenta::ObtenerMonedaPorCuenta($tipoCuenta);
+        // $data = AutentificadorJWT::ObtenerData($token);
+        // $nroCuenta = $data->nroCuenta;
+        // $tipoCuenta = $data->tipoCuenta;
         
         $parametros = $request->getParsedBody();
+        $nroCuenta = $parametros['nroCuenta'];
+        $tipoCuenta = $parametros['tipoCuenta'];
         $deposito = $parametros['deposito'];
-        $saldo = Cuenta::ObtenerSaldoPorNroCuenta($nroCuenta);
+        $moneda = Cuenta::ObtenerMonedaPorCuenta($tipoCuenta);
+        $cuenta = Cuenta::ObtenerCuentaPorNroCuenta($nroCuenta);
+        $saldo = $cuenta->saldo;
 
         // Creamos el deposito
         $depositoNuevo = new Deposito();
@@ -36,7 +39,7 @@ class DepositoController extends Deposito /*implements IApiUsable*/
         Cuenta::ActualizarSaldo($nroCuenta,$deposito);
         $depositoNuevo->GuardarImagen($_FILES['imagen']['tmp_name']);
 
-        $payload = json_encode(array("mensaje" => "Deposito creado con exito"));
+        $payload = json_encode(array("mensaje" => "Deposito creado con exito<br>". $depositoNuevo->__toString()));
 
         $response->getBody()->write($payload);
 
@@ -45,35 +48,37 @@ class DepositoController extends Deposito /*implements IApiUsable*/
     
     public function TotalDepositadoController($request, $response, $args)
     {
-        $queryParams = $request->getQueryParams();
-        $fecha = $queryParams['fecha'];
-        
-        $header = $request->getHeaderLine('Authorization');
-        $token = trim(explode("Bearer", $header)[1]);
+        // $header = $request->getHeaderLine('Authorization');
+        // $token = trim(explode("Bearer", $header)[1]);
 
-        $data = AutentificadorJWT::ObtenerData($token);
-        $tipoCuenta = $data->tipoCuenta;
+        // $data = AutentificadorJWT::ObtenerData($token);
+        // $tipoCuenta = $data->tipoCuenta;
+        $queryParams = $request->getQueryParams();
+        $tipoCuenta = $queryParams['tipoCuenta'];
+        if(isset($queryParams['fecha']) && !empty($queryParams['fecha'])) {
+            $fecha = $queryParams['fecha'];
+        }else{
+            $fechaAnterior = date("d-m-Y", strtotime(date("d-m-Y") . "-1 day"));
+            $fecha = $fechaAnterior;
+        }
         $moneda = Cuenta::ObtenerMonedaPorCuenta($tipoCuenta);
 
         $lista = Deposito::ObtenerTodosDepositos();
-        // var_dump($fecha);
         $listaNueva = Array();
         $totalDepositado = 0;
         foreach($lista as $deposito)
         {
             $fechaDeposito = new DateTime($deposito->fecha);
-            // var_dump($fechaDeposito);
             $fechaDepositoFormateada = $fechaDeposito->format('d-m-Y');
-            // var_dump($fechaDepositoFormateada);
             if($deposito->tipoCuenta == $tipoCuenta && $deposito->moneda == $moneda && $fechaDepositoFormateada === $fecha){
-                $listaNueva[] = $deposito;
+                $listaNueva[] = $deposito->__toString() . "<br>-----------------<br>";
                 $totalDepositado += $deposito->deposito;
             }
         }
 
         $payloadArray = array(
-            "total Depositado: <br>" => $totalDepositado,
-            "lista Depositos: <br>" => $listaNueva
+            "<br> total Depositado: " => $totalDepositado,
+            "<br>lista Depositos: <br>" => $listaNueva
         );
     
         $payload = json_encode($payloadArray);
@@ -88,7 +93,6 @@ class DepositoController extends Deposito /*implements IApiUsable*/
         $token = trim(explode("Bearer", $header)[1]);
 
         $data = AutentificadorJWT::ObtenerData($token);
-        // var_dump($data->nroDocumento);
         $nroDocumento = $data->nroDocumento;
         // $nroCuenta = $data->nroCuenta;
         $listaDepositos = Deposito::ObtenerTodosDepositos();
@@ -98,7 +102,7 @@ class DepositoController extends Deposito /*implements IApiUsable*/
         {
             foreach($listaDepositos as $deposito){
                 if($deposito->nroCuenta == $cuenta->nroCuenta){
-                    $lista[] = $deposito;
+                    $lista[] = $deposito->__toString() . "<br>-----------------<br>";
                 }
             }
         }
@@ -117,7 +121,6 @@ class DepositoController extends Deposito /*implements IApiUsable*/
         $fechaFin = $queryParams["fechaFin"];
 
         $depositosEntreFechas = Deposito::ObtenerDepositosEntreFechas($fechaInicio,$fechaFin);
-        // var_dump($depositosEntreFechas);
         $depositos = Deposito::OrdenarDepositosPorNumeroCuenta($depositosEntreFechas);
         if($depositos !== null && !empty($depositos)){
 
@@ -139,7 +142,7 @@ class DepositoController extends Deposito /*implements IApiUsable*/
 
         foreach($listaDepositos as $deposito){
             if($deposito->tipoCuenta == $tipoCuenta){
-                $lista[] = $deposito;
+                $lista[] = $deposito->__toString()."<br>-----------------<br>";
             }
         }
 
@@ -160,7 +163,6 @@ class DepositoController extends Deposito /*implements IApiUsable*/
                 $lista[] = $deposito;
             }
         }
-
 
         $payload = json_encode(array("lista_depositos" => $lista));
         $response->getBody()->write($payload);

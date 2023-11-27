@@ -1,6 +1,6 @@
 <?php
 
-    class Retiro /*implements JsonSerializable*/{
+    class Retiro {
         public $id;
         public $fecha;
         public $nroCuenta;
@@ -96,5 +96,15 @@
         public static function OrdenarRetirosPorNumeroCuenta($retiros){
             usort($retiros, 'Retiro::CompararPorNumeroDeCuenta');
             return $retiros;
+        }
+        public function __toString() {
+            return 
+            // "id " . $this->id .
+            // "<br>fecha: " . $this->fecha .
+            "<br>nroCuenta: " . $this->nroCuenta .
+            "<br>tipoCuenta: " . $this->tipoCuenta .
+            "<br>moneda: " . $this->moneda .
+            "<br>retiro: " . $this->retiro .
+            "<br>saldo: " . $this->saldo;
         }
     }

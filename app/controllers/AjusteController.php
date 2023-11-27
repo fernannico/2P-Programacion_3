@@ -44,7 +44,8 @@ class AjusteController extends Ajuste{
                 if($motivo == 'saldo positivo'){
                     Cuenta::ActualizarSaldo($nroCuenta,$monto);
                     $ajusteNuevo->crearAjuste();
-                    $payload = json_encode(array("mensaje" => "Ajuste realizado con exito"));
+                    // var_dump($ajusteNuevo);
+                    $payload = json_encode(array("mensaje" => "Ajuste realizado con exito<br>" . $ajusteNuevo->__toString()));
                 }else if($motivo == 'saldo negativo'){
                     if($monto > $cuentaAjustable->saldo){
                         $payload = json_encode(array('error: ' => '<br>El ajuste negativo no puede ser mayor al balance de la cuenta: <br>balance actual: $'. $cuentaAjustable->saldo));
@@ -52,8 +53,10 @@ class AjusteController extends Ajuste{
                         $montoNegativo = $monto * -1;
                         Cuenta::ActualizarSaldo($nroCuenta,$montoNegativo);
                         $ajusteNuevo->crearAjuste();
-                        $payload = json_encode(array("mensaje" => "Ajuste realizado con exito"));
+                        $payload = json_encode(array("mensaje" => "Ajuste realizado con exito<br>" . $ajusteNuevo->__toString()));
                     }
+                }else{
+                    $payload = json_encode(array("mensaje" => "Se debe ingresar si se ajusta un saldo positivo o negativo"));
                 }
             }elseif($tipoOperacion == "retiro"){
                 if($motivo == 'saldo positivo'){
@@ -62,7 +65,7 @@ class AjusteController extends Ajuste{
                     }else{
                         Cuenta::ActualizarSaldo($nroCuenta,$monto);
                         $ajusteNuevo->crearAjuste();
-                        $payload = json_encode(array("mensaje" => "Ajuste realizado con exito"));
+                        $payload = json_encode(array("mensaje" => "Ajuste realizado con exito<br>" . $ajusteNuevo->__toString()));
                     }
                 }else if($motivo == 'saldo negativo'){
                     if($monto > $cuentaAjustable->saldo){
@@ -71,15 +74,18 @@ class AjusteController extends Ajuste{
                         $montoNegativo = $monto * -1;
                         Cuenta::ActualizarSaldo($nroCuenta,$montoNegativo);
                         $ajusteNuevo->crearAjuste();
-                        $payload = json_encode(array("mensaje" => "Ajuste realizado con exito"));
+                        $payload = json_encode(array("mensaje" => "Ajuste realizado con exito<br>" . $ajusteNuevo->__toString()));
                     }
+                }else{
+                    $payload = json_encode(array("mensaje" => "Se debe ingresar si se ajusta un saldo positivo o negativo"));
                 }
+            }else{
+                $payload = json_encode(array("mensaje" => "Se debe ingresar si se ajusta un deposito o retiro"));
             }
         }else{
             $payload = json_encode(array("mensaje" => "No existe el ". $tipoOperacion . " con el id " .$idOperacion));
         }
 
-        // $payload = json_encode(array("mensaje" => "Ajuste realizado con exito"));
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }

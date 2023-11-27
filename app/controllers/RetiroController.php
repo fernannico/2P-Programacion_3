@@ -8,33 +8,39 @@ class RetiroController extends Retiro /*implements IApiUsable*/
     
     public function CargarRetiro($request, $response, $args)
     {
+        // $header = $request->getHeaderLine('Authorization');
+        // $token = trim(explode("Bearer", $header)[1]);
         
-        $header = $request->getHeaderLine('Authorization');
-        $token = trim(explode("Bearer", $header)[1]);
-        
-        $data = AutentificadorJWT::ObtenerData($token);
-        $nroCuenta = $data->nroCuenta;
-        $tipoCuenta = $data->tipoCuenta;
-        $moneda = Cuenta::ObtenerMonedaPorCuenta($tipoCuenta);
+        // $data = AutentificadorJWT::ObtenerData($token);
+        // $nroCuenta = $data->nroCuenta;
+        // $tipoCuenta = $data->tipoCuenta;
         
         $parametros = $request->getParsedBody();
+        $nroCuenta = $parametros['nroCuenta'];
+        $tipoCuenta = $parametros['tipoCuenta'];
         $retiro = $parametros['retiro'];
-        $saldo = Cuenta::ObtenerSaldoPorNroCuenta($nroCuenta);
+        $moneda = Cuenta::ObtenerMonedaPorCuenta($tipoCuenta);        
+        $cuenta = Cuenta::ObtenerCuentaPorNroCuenta($nroCuenta);
+        $saldo = $cuenta->saldo;
 
-        // Creamos el retiro
-        $retiroNuevo = new Retiro();
-        $retiroNuevo->nroCuenta = $nroCuenta;
-        $retiroNuevo->tipoCuenta = $tipoCuenta;
-        $retiroNuevo->moneda = $moneda;
-        $retiroNuevo->retiro = $retiro;
-        $retiroNuevo->saldo = $saldo - $retiro;
-        $retiroNuevo->crearRetiro();
-
-        $retiro = $retiro * -1;
-        Cuenta::ActualizarSaldo($nroCuenta,$retiro);
-        // var_dump($retiro);
-
-        $payload = json_encode(array("mensaje" => "Retiro creado con exito"));
+        if($retiro > $saldo){
+            $payload = json_encode(array("mensaje" => "El monto retirado no puede superar al saldo de la cuenta <br>Saldo: $" . $saldo));
+        }else{
+            // Creamos el retiro
+            $retiroNuevo = new Retiro();
+            $retiroNuevo->nroCuenta = $nroCuenta;
+            $retiroNuevo->tipoCuenta = $tipoCuenta;
+            $retiroNuevo->moneda = $moneda;
+            $retiroNuevo->retiro = $retiro;
+            $retiroNuevo->saldo = $saldo - $retiro;
+            $retiroNuevo->crearRetiro();
+    
+            $retiro = $retiro * -1;
+            Cuenta::ActualizarSaldo($nroCuenta,$retiro);
+            // var_dump($retiro);
+    
+            $payload = json_encode(array("mensaje" => "Retiro creado con exito <br>" . $retiroNuevo->__toString()));
+        }
 
         $response->getBody()->write($payload);
 
@@ -43,26 +49,28 @@ class RetiroController extends Retiro /*implements IApiUsable*/
     
     public function TotalRetiradoController($request, $response, $args)
     {
-        $queryParams = $request->getQueryParams();
-        $fecha = $queryParams['fecha'];
-        
-        $header = $request->getHeaderLine('Authorization');
-        $token = trim(explode("Bearer", $header)[1]);
+        // $header = $request->getHeaderLine('Authorization');
+        // $token = trim(explode("Bearer", $header)[1]);
 
-        $data = AutentificadorJWT::ObtenerData($token);
-        $tipoCuenta = $data->tipoCuenta;
+        // $data = AutentificadorJWT::ObtenerData($token);
+        // $tipoCuenta = $data->tipoCuenta;
+        $queryParams = $request->getQueryParams();
+        $tipoCuenta = $queryParams['tipoCuenta'];
+        if(isset($queryParams['fecha']) && !empty($queryParams['fecha'])) {
+            $fecha = $queryParams['fecha'];
+        }else{
+            $fechaAnterior = date("d-m-Y", strtotime(date("d-m-Y") . "-1 day"));
+            $fecha = $fechaAnterior;
+        }        
         $moneda = Cuenta::ObtenerMonedaPorCuenta($tipoCuenta);
 
         $lista = Retiro::ObtenerTodosRetiros();
-        // var_dump($fecha);
         $listaNueva = Array();
         $totalRetirado = 0;
         foreach($lista as $retiro)
         {
             $fechaRetiro = new DateTime($retiro->fecha);
-            // var_dump($fechaRetiro);
             $fechaRetiroFormateada = $fechaRetiro->format('d-m-Y');
-            // var_dump($fechaRetiroFormateada);
             if($retiro->tipoCuenta == $tipoCuenta && $retiro->moneda == $moneda && $fechaRetiroFormateada === $fecha){
                 $listaNueva[] = $retiro;
                 $totalRetirado += $retiro->retiro;

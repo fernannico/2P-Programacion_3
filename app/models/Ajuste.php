@@ -24,4 +24,13 @@
             return $objAccesoDatos->obtenerUltimoId();
         }
 
+        public function __toString(){
+            return   
+            // 'ID: ' . $this->GetId() .
+            '<br>numero cuenta: ' . $this->nroCuenta .
+            '<br>Id operacion: ' . $this->idOperacion .
+            '<br>tipo Operacion: ' . $this->tipoOperacion .
+            '<br>Motivo: ' . $this->motivo .
+            '<br>Monto: ' . $this->monto;
+        }
     }
