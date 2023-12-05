@@ -30,6 +30,7 @@ require_once './Middlewares/AuthDniMW.php';
 require_once './Middlewares/AuthRolMW.php';
 require_once './Middlewares/AuthRolLoginMW.php';
 require_once './Middlewares/LoggerMW.php';
+require_once './controllers/LoggerController.php';
 
 // Instantiate App
 $app = AppFactory::create();
@@ -81,7 +82,11 @@ $app->group('/operaciones', function (RouteCollectorProxy $group) {
         ->add(new AuthRolLoginMW("supervisor"));     //validar el sector
 
 })->add(\ValidarLoginMW::class)->add(\LoggerMW::class);;           
-        
+
+$app->group('/pdf', function (RouteCollectorProxy $group) {
+    $group->get('[/]', \LoggerController::class . ':LoggerController');
+});
+
 $app->group('/consultas', function (RouteCollectorProxy $group) {
     $group->post('/consultarCuenta', \CuentaController::class . ':ConsultarCuentaController')
         ->add(\AuthTipoCuentaMW::class)             //validar el tipo de cuenta

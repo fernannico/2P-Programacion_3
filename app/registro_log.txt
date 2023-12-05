@@ -1,0 +1,78 @@
+39
+Fecha: 2023-11-28 00:59:55 | Acción solicitada: totalRetirado
+38
+Fecha: 2023-11-28 00:34:28 | Acción solicitada: ajuste
+37
+Fecha: 2023-11-28 00:34:22 | Acción solicitada: retiro
+36
+Fecha: 2023-11-28 00:33:42 | Acción solicitada: login
+35
+Fecha: 2023-11-28 00:33:01 | Acción solicitada: retirosFechas
+34
+Fecha: 2023-11-28 00:32:41 | Acción solicitada: totalDepositado
+33
+Fecha: 2023-11-28 00:32:24 | Acción solicitada: ajuste
+32
+Fecha: 2023-11-28 00:32:12 | Acción solicitada: login
+31
+Fecha: 2023-11-28 00:32:05 | Acción solicitada: cargarUsuario
+30
+Fecha: 2023-11-28 00:31:44 | Acción solicitada: deposito
+29
+Fecha: 2023-11-28 00:24:25 | Acción solicitada: retirosUsuario
+28
+Fecha: 2023-11-28 00:24:15 | Acción solicitada: retirosUsuario
+27
+Fecha: 2023-11-28 00:23:57 | Acción solicitada: depositosUsuario
+26
+Fecha: 2023-11-28 00:22:38 | Acción solicitada: consultarOperaciones
+25
+Fecha: 2023-11-28 00:21:55 | Acción solicitada: consultarOperaciones
+24
+Fecha: 2023-11-28 00:21:09 | Acción solicitada: depositosUsuario
+23
+Fecha: 2023-11-28 00:20:55 | Acción solicitada: depositosUsuario
+22
+Fecha: 2023-11-28 00:16:03 | Acción solicitada: consultarOperaciones
+21
+Fecha: 2023-11-28 00:15:54 | Acción solicitada: consultarOperaciones
+20
+Fecha: 2023-11-28 00:15:50 | Acción solicitada: consultarCuenta
+19
+Fecha: 2023-11-28 00:15:31 | Acción solicitada: login
+18
+Fecha: 2023-11-28 00:15:28 | Acción solicitada: consultarCuenta
+17
+Fecha: 2023-11-28 00:14:34 | Acción solicitada: ajuste
+16
+Fecha: 2023-11-28 00:13:40 | Acción solicitada: consultarCuenta
+15
+Fecha: 2023-11-28 00:13:29 | Acción solicitada: login
+14
+Fecha: 2023-11-28 00:13:10 | Acción solicitada: cargarUsuario
+13
+Fecha: 2023-11-28 00:12:55 | Acción solicitada: consultarOperaciones
+12
+Fecha: 2023-11-28 00:12:51 | Acción solicitada: consultarCuenta
+11
+Fecha: 2023-11-28 00:11:33 | Acción solicitada: modificarCuenta
+10
+Fecha: 2023-11-28 00:11:27 | Acción solicitada: bajarCuenta
+9
+Fecha: 2023-11-28 00:11:18 | Acción solicitada: cargarCuenta
+8
+Fecha: 2023-11-28 00:11:05 | Acción solicitada: cargarCuenta
+7
+Fecha: 2023-11-28 00:07:57 | Acción solicitada: retiro
+6
+Fecha: 2023-11-28 00:07:22 | Acción solicitada: POST deposito
+5
+Fecha: 2023-11-28 00:00:29 | Acción solicitada: /2P-Programacion_3/app/operaciones/retiro
+4
+Fecha: 2023-11-28 00:00:25 | Acción solicitada: /2P-Programacion_3/app/operaciones/ajuste
+3
+Fecha: 2023-11-27 23:59:19 | Acción solicitada: POST /2P-Programacion_3/app/operaciones/retiro
+2
+Fecha: 2023-11-27 23:56:18 | Acción solicitada: POST /2P-Programacion_3/app/operaciones/deposito
+1
+Fecha: 2023-11-27 23:55:34 | Acción solicitada: POST /2P-Programacion_3/app/operaciones/deposito
